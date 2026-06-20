@@ -16,7 +16,6 @@ font-family:monospace;
 overflow:hidden;
 }
 
-
 canvas{
 position:fixed;
 width:100%;
@@ -25,127 +24,83 @@ z-index:-5;
 opacity:.5;
 }
 
-
 .tv{
 position:fixed;
 inset:0;
 background:repeating-linear-gradient(
-0deg,
-rgba(255,255,255,.08),
+0deg,rgba(255,255,255,.08),
 transparent 3px);
 animation:tv .15s infinite;
 z-index:5;
 }
 
-
 @keyframes tv{
 50%{opacity:.2}
 }
-
 
 .box{
 text-align:center;
 margin-top:25px;
 }
 
-
 #ai{
 font-size:90px;
 animation:pulse .7s infinite;
 }
 
-
 @keyframes pulse{
 50%{transform:scale(1.2)}
 }
-
-
 
 #warn{
 font-size:80px;
 animation:flash .4s infinite;
 }
 
-
-
 .limz{
 font-size:60px;
 letter-spacing:8px;
-
 text-shadow:
 0 0 25px lime,
 5px 0 red,
 -5px 0 blue;
-
 animation:glitch .15s infinite;
 }
 
-
 @keyframes glitch{
-
-50%{
-transform:translate(6px,-4px)
+50%{transform:translate(5px,-3px)}
 }
-
-}
-
-
 
 @keyframes flash{
-
-50%{
-opacity:0;
+50%{opacity:0}
 }
-
-}
-
-
 
 .shake{
-
 animation:shake .1s infinite;
-
 }
-
 
 @keyframes shake{
-
 0%{transform:translate(4px,2px)}
-
 50%{transform:translate(-4px,-3px)}
-
 100%{transform:translate(3px,-2px)}
-
 }
-
 
 
 #clock{
-
 font-size:35px;
-
 color:red;
-
 text-shadow:0 0 20px red;
-
 }
-
-
 
 h1{
-
 color:red;
-
 animation:flash .8s infinite;
-
 }
-
 
 
 #terminal{
 
 width:85%;
-
 height:130px;
 
 margin:15px auto;
@@ -154,9 +109,9 @@ border:1px solid lime;
 
 padding:10px;
 
-text-align:left;
-
 overflow:hidden;
+
+text-align:left;
 
 background:#000c;
 
@@ -179,6 +134,7 @@ margin:auto;
 }
 
 
+
 .load{
 
 height:100%;
@@ -190,24 +146,18 @@ animation:load 6s infinite;
 }
 
 
+
 @keyframes load{
-
 100%{width:100%}
-
 }
-
-
 
 
 
 #popupContainer{
 
 position:fixed;
-
 inset:0;
-
-z-index:80;
-
+z-index:50;
 pointer-events:none;
 
 }
@@ -220,48 +170,39 @@ position:absolute;
 
 background:#000;
 
-border:2px solid red;
+border:2px red solid;
 
 color:red;
 
-padding:14px;
+padding:15px;
 
 font-size:20px;
 
 box-shadow:0 0 25px red;
 
-animation:movePop 1.2s infinite alternate;
-
 }
 
 
 
-@keyframes movePop{
+#count{
 
+position:fixed;
 
-0%{
+top:20%;
 
-transform:translate(0,0) rotate(0deg);
+width:100%;
 
-}
+text-align:center;
 
+font-size:90px;
 
-50%{
+color:red;
 
-transform:translate(50px,-40px) rotate(10deg);
+display:none;
 
-}
-
-
-100%{
-
-transform:translate(-40px,60px) rotate(-10deg);
+z-index:60;
 
 }
-
-
-}
-
 
 
 
@@ -281,11 +222,39 @@ color:red;
 
 display:none;
 
-z-index:90;
+z-index:70;
 
 }
 
 
+
+#alarmBtn{
+
+position:fixed;
+
+bottom:25px;
+
+left:50%;
+
+transform:translateX(-50%);
+
+background:#000;
+
+color:red;
+
+border:2px solid red;
+
+padding:15px 30px;
+
+font-size:20px;
+
+font-family:monospace;
+
+box-shadow:0 0 20px red;
+
+z-index:100;
+
+}
 
 </style>
 
@@ -303,11 +272,17 @@ z-index:90;
 <div id="popupContainer"></div>
 
 
+<div id="count"></div>
+
+
 <div id="scare">
-
 ⚠ SYSTEM FAILURE ⚠
-
 </div>
+
+
+<button id="alarmBtn" onclick="startAlarm()">
+🔊 AKTIFKAN ALARM
+</button>
 
 
 
@@ -316,45 +291,30 @@ z-index:90;
 
 <div id="ai">👁</div>
 
-
 <div id="warn">⚠️⚠️⚠️</div>
 
-
 <div class="limz">
-
 LIMZHACKER
-
 </div>
-
 
 
 <div id="clock">
-
 00:00:00
-
 </div>
 
 
-
 <h1>
-
 ⚠ SYSTEM BREACH ⚠
-
 </h1>
 
 
 <h2>
-
-Scanning System...
-
+Scanning...
 </h2>
 
 
-
 <div class="bar">
-
 <div class="load"></div>
-
 </div>
 
 
@@ -365,50 +325,34 @@ Scanning System...
 
 
 
-
-
-
 <script>
 
 
 /* terminal */
 
-
-let term=document.getElementById("terminal");
-
-
 let logs=[
-
 "[+] Loading AI",
-
 "[+] Checking System",
-
 "[+] Signal Found",
-
-"[+] ERROR DETECTED",
-
+"[+] Error Detected",
 "[+] Warning Mode"
-
 ];
-
 
 let a=0;
 
 
 setInterval(()=>{
 
-
-term.innerHTML+=
+terminal.innerHTML+=
 logs[a%logs.length]+"<br>";
 
 a++;
 
+if(terminal.innerHTML.length>600)
+terminal.innerHTML="";
 
-if(term.innerHTML.length>600)
-term.innerHTML="";
 
-
-},400);
+},500);
 
 
 
@@ -418,11 +362,9 @@ term.innerHTML="";
 
 /* matrix */
 
-
 let c=document.getElementById("matrix");
 
 let ctx=c.getContext("2d");
-
 
 c.width=innerWidth;
 
@@ -443,11 +385,10 @@ drops[i]=1;
 
 function matrix(){
 
-
-ctx.fillStyle="rgba(0,0,0,.08)";
+ctx.fillStyle=
+"rgba(0,0,0,.08)";
 
 ctx.fillRect(0,0,c.width,c.height);
-
 
 
 ctx.fillStyle="lime";
@@ -465,12 +406,10 @@ y*size
 );
 
 
-
 drops[i]++;
 
 
 if(y*size>c.height)
-
 drops[i]=0;
 
 
@@ -487,25 +426,20 @@ setInterval(matrix,40);
 
 
 
+
 /* jam */
 
 
 function jam(){
 
-
 let d=new Date();
 
-
 clock.innerHTML=
-d.getHours().toString().padStart(2,"0")
-+":"
-+d.getMinutes().toString().padStart(2,"0")
-+":"
-+d.getSeconds().toString().padStart(2,"0");
-
+d.getHours().toString().padStart(2,"0")+":"+
+d.getMinutes().toString().padStart(2,"0")+":"+
+d.getSeconds().toString().padStart(2,"0");
 
 }
-
 
 setInterval(jam,1000);
 
@@ -516,22 +450,16 @@ jam();
 
 
 
-/* popup bergerak delay */
 
+/* popup delay */
 
 let errors=[
 
 "⚠ UNKNOWN SIGNAL",
-
 "⚠ SYSTEM ERROR",
-
 "⚠ ACCESS DENIED",
-
 "⚠ DATA CORRUPTED",
-
-"⚠ CONNECTION LOST",
-
-"⚠ AI FAILURE"
+"⚠ CONNECTION LOST"
 
 ];
 
@@ -540,41 +468,29 @@ let errors=[
 function showErrors(){
 
 
-let box=document.getElementById("popupContainer");
+popupContainer.innerHTML="";
 
 
-box.innerHTML="";
-
-
-
-for(let i=0;i<70;i++){
+for(let i=0;i<45;i++){
 
 
 let p=document.createElement("div");
 
-
 p.className="errPop";
-
 
 p.innerHTML=
 errors[Math.floor(Math.random()*errors.length)];
 
 
+p.style.left=Math.random()*90+"%";
 
-p.style.left=
-Math.random()*90+"%";
-
-
-p.style.top=
-Math.random()*90+"%";
+p.style.top=Math.random()*90+"%";
 
 
-
-box.appendChild(p);
+popupContainer.appendChild(p);
 
 
 }
-
 
 }
 
@@ -582,9 +498,7 @@ box.appendChild(p);
 
 setTimeout(()=>{
 
-
 showErrors();
-
 
 
 setInterval(()=>{
@@ -593,22 +507,13 @@ setInterval(()=>{
 popupContainer.innerHTML="";
 
 
-setTimeout(()=>{
-
-
-showErrors();
-
-
-},2000);
-
+setTimeout(showErrors,2000);
 
 
 },6000);
 
 
-
 },2000);
-
 
 
 
@@ -620,24 +525,18 @@ showErrors();
 
 setInterval(()=>{
 
-
 document.body.classList.add("shake");
-
 
 scare.style.display="block";
 
 
 setTimeout(()=>{
 
-
 document.body.classList.remove("shake");
-
 
 scare.style.display="none";
 
-
 },800);
-
 
 
 },8000);
@@ -647,10 +546,8 @@ scare.style.display="none";
 
 
 
-/* siren */
 
-
-window.onload=()=>{
+/* alarm */
 
 
 let audio=
@@ -665,7 +562,6 @@ function siren(){
 let o=audio.createOscillator();
 
 let b=audio.createOscillator();
-
 
 
 let g=audio.createGain();
@@ -690,42 +586,23 @@ o.type="square";
 b.type="sine";
 
 
-
 let now=audio.currentTime;
 
 
 
 o.frequency.setValueAtTime(300,now);
 
+o.frequency.linearRampToValueAtTime(1400,now+4);
 
-o.frequency.linearRampToValueAtTime(
-1400,
-now+4
-);
-
-
-
-o.frequency.linearRampToValueAtTime(
-250,
-now+9
-);
+o.frequency.linearRampToValueAtTime(250,now+9);
 
 
 
 b.frequency.setValueAtTime(40,now);
 
+b.frequency.linearRampToValueAtTime(150,now+4);
 
-b.frequency.linearRampToValueAtTime(
-150,
-now+4
-);
-
-
-
-b.frequency.linearRampToValueAtTime(
-35,
-now+9
-);
+b.frequency.linearRampToValueAtTime(35,now+9);
 
 
 
@@ -749,6 +626,9 @@ b.stop(now+9);
 
 
 
+
+function startAlarm(){
+
 audio.resume().then(()=>{
 
 
@@ -761,14 +641,17 @@ siren,
 );
 
 
+alarmBtn.innerHTML=
+"🚨 ALARM AKTIF";
+
+
 });
 
 
-};
+}
 
 
 </script>
 
-
 </body>
-</html>
+  </html>
